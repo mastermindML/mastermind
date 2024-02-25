@@ -93,7 +93,7 @@ Creating intelligent agents for simulations and virtual environments.
 Designing systems where agent behavior is driven by complex internal states.
 
 <b>SimpleCoder.py</b>
-Purpose: Likely a utility module providing coding aids, templates, and functions to simplify development tasks.
+Purpose: Utility module providing coding aids, templates, and functions to simplify development tasks.
 Functionality:
 
 Offers reusable code snippets, templates, and utility functions.
