@@ -1,6 +1,7 @@
 # MASTERMIND (c) codephreak GPLv3 2024
 MASTERMIND agent creator and control agent<br />
-MASTERMIND.py
+
+<b>MASTERMIND.py</b>
 Purpose: This file serves as the core of the MASTERMIND system, orchestrating the interaction between various components and managing the overall workflow.
 Functionality:
 
@@ -11,7 +12,7 @@ Use Cases:
 Serving as the entry point for the system to execute complex tasks.
 Orchestrating multi-module interactions for comprehensive data processing and decision-making.
 
-prediction.py
+<b>prediction.py</b>
 Purpose: Dedicated to forecasting future states or outcomes based on historical data and predictive models.
 Functionality:
 
@@ -21,7 +22,7 @@ Use Cases:
 Predicting user behaviors, market trends, or system performances.
 Providing insights for decision-making and strategic planning.
 
-nonmonotonic.py
+<b>nonmonotonic.py</b>
 Purpose: Implements non-monotonic reasoning to allow the system to adapt its beliefs and knowledge base in light of new information, especially when it contradicts previous assumptions.
 Functionality:
 
@@ -31,7 +32,7 @@ Use Cases:
 Adapting to new information in rapidly changing environments.
 Revising decisions or plans based on updated information.
 
-socratic.py
+<b>socratic.py</b>
 Purpose: Inspired by the Socratic method, this module likely facilitates a question-and-answer style of learning or problem-solving.
 Functionality:
 
@@ -41,7 +42,7 @@ Use Cases:
 Guiding educational interactions or tutorials.
 Enhancing problem-solving by encouraging critical thinking and exploration.
 
-reasoning.py
+<b>reasoning.py</b>
 Purpose: Provides the logic and infrastructure for various types of reasoning, including deductive, inductive, and abductive reasoning.
 Functionality:
 
@@ -51,7 +52,7 @@ Use Cases:
 Drawing conclusions from a set of premises or known facts.
 Generating hypotheses or explanations for observed phenomena.
 
-logic.py
+<b>logic.py</b>
 Purpose: Focuses on implementing formal logic systems and operations, providing a foundation for reasoning and decision-making processes.
 Functionality:
 
@@ -61,7 +62,7 @@ Use Cases:
 Supporting the reasoning processes in AI systems.
 Validating arguments and ensuring consistency in logical frameworks.
 
-epistemic.py
+<b>epistemic.py</b>
 Purpose: Manages the knowledge and beliefs within the system, tracking what is known, believed, and how these states change over time.
 Functionality:
 
@@ -71,7 +72,7 @@ Use Cases:
 Modeling the knowledge base of intelligent agents.
 Supporting decision-making processes that depend on the state of knowledge.
 
-autonomize.py
+<b>autonomize.py</b>
 Purpose: Enhances the autonomy of agents or components, allowing for self-directed operation and decision-making for self-healing software.
 Functionality:
 
@@ -81,7 +82,7 @@ Use Cases:
 Developing self-improving AI systems.
 Automating decision-making in dynamic and complex environments.
 
-bdi.py
+<b>bdi.py</b>
 Purpose: Implements the Beliefs, Desires, Intentions (BDI) agent framework, modeling the cognitive structure of agents.
 Functionality:
 
@@ -91,7 +92,7 @@ Use Cases:
 Creating intelligent agents for simulations and virtual environments.
 Designing systems where agent behavior is driven by complex internal states.
 
-SimpleCoder.py
+<b>SimpleCoder.py</b>
 Purpose: Likely a utility module providing coding aids, templates, and functions to simplify development tasks.
 Functionality:
 
@@ -100,3 +101,6 @@ Aims to enhance productivity and maintain consistency across the codebase.
 Use Cases:
 Accelerating development processes by providing common coding patterns.
 Ensuring code quality and consistency with standardized templates and functions.
+
+<b>config.json</b> offers the default allowed agency for MASTERMIND<br />
+This is experimental softare and needs to be jailed to protect potential system damage
