@@ -1,4 +1,4 @@
-# MASTERMIND (c) codephreak GPLv3 2024
+# <a href="https://opensea.io/assets/matic/0xf0ba8dcdfba1b5aed0b46acddf7dde97075e97a2/1">MASTERMIND</a> (c) codephreak GPLv3 2024
 MASTERMIND agent creator and control agent<br />
 
 <b>MASTERMIND.py</b>
