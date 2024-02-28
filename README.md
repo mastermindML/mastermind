@@ -104,3 +104,4 @@ Ensuring code quality and consistency with standardized templates and functions.
 
 <b>config.json</b> offers the default allowed agency for MASTERMIND<br />
 This is experimental softare and needs to be jailed to protect potential system damage
+TODO: sandbox controller for integration with shell
