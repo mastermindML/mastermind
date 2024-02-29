@@ -95,6 +95,10 @@ Designing systems where agent behavior is driven by complex internal states.
 <b>terminai.py</b>
 separates openai api interaction from assistant into cmd: command-mode
 adds API key to .env on first run and creates .env
+standalone test file python3 terminai.py
+
+<b>terminai_module.py</b>
+integrates terminai.py functionalities into MASTERMIND as a modular class to include SimpleCoder.py interaction with terminal as cmd:
 
 <b>SimpleCoder.py</b>
 Purpose: Utility module providing coding aids, templates, and functions to simplify development tasks.
