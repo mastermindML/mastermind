@@ -92,6 +92,10 @@ Use Cases:
 Creating intelligent agents for simulations and virtual environments.
 Designing systems where agent behavior is driven by complex internal states.
 
+<b>terminai.py</a>
+separates openai api interaction from assistant into cmd: command-mode
+adds API key to .env on first run and creates .env
+
 <b>SimpleCoder.py</b>
 Purpose: Utility module providing coding aids, templates, and functions to simplify development tasks.
 Functionality:
