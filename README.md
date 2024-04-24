@@ -1,6 +1,10 @@
 # <a href="https://opensea.io/assets/matic/0xf0ba8dcdfba1b5aed0b46acddf7dde97075e97a2/1">MASTERMIND</a> (c) codephreak GPLv3 2024
 MASTERMIND agent creator and control agent<br />
 
+This MASTERMIND point of departure has been archived visit <a href="https://github.com/gaterage/aglm</a> for the current development model<br />
+
+
+
 <b>MASTERMIND.py</b>
 Purpose: This file serves as the core of the MASTERMIND system, orchestrating the interaction between various components and managing the overall workflow.
 Functionality:
