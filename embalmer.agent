@@ -1,0 +1,200 @@
+import os
+import subprocess
+import sys
+import logging
+import getpass
+
+class EmbalmerAgent:
+    """
+    EmbalmerAgent is a class that provides functionality to manage encrypted Tombs for securely storing sensitive files.
+    
+    Attributes:
+        env_path (str): The path to the .env file that contains sensitive information to be encrypted.
+        tombs (dict): A dictionary that keeps track of Tombs by their name, storing both the Tomb file path and its corresponding key file.
+    """
+    
+    def __init__(self, env_path='.env'):
+        """
+        Initializes the EmbalmerAgent with a specified .env file path and an empty dictionary for managing multiple Tombs.
+        
+        Args:
+            env_path (str): Path to the .env file where sensitive information is stored.
+        """
+        self.env_path = env_path
+        self.tombs = {}  # Dictionary to manage multiple Tombs
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+    def check_tomb_installed(self):
+        """
+        Checks if Tomb is installed on the system. If not, it prompts the user to install Tomb.
+        """
+        try:
+            subprocess.run(['tomb', '--version'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            logging.info("Tomb is already installed.")
+        except subprocess.CalledProcessError:
+            logging.warning("Tomb is not installed.")
+            install = input("Tomb is not installed. Would you like to install it? (yes/no): ").strip().lower()
+            if install == 'yes':
+                self.install_tomb()
+            else:
+                logging.error("Tomb installation is required to proceed.")
+                sys.exit(1)
+
+    def install_tomb(self):
+        """
+        Downloads and installs Tomb from the official source. This method is called if Tomb is not already installed.
+        
+        Raises:
+            SystemExit: If an error occurs during the installation process, the script will exit.
+        """
+        try:
+            logging.info("Downloading Tomb...")
+            subprocess.run(['wget', 'https://files.dyne.org/tomb/Tomb-2.10.tar.gz', '-O', '/tmp/Tomb-2.10.tar.gz'], check=True)
+            logging.info("Extracting Tomb...")
+            subprocess.run(['tar', 'xvzf', '/tmp/Tomb-2.10.tar.gz', '-C', '/tmp'], check=True)
+            logging.info("Installing Tomb...")
+            subprocess.run(['sudo', 'make', 'install'], cwd='/tmp/Tomb-2.10', check=True)
+            logging.info("Tomb installed successfully.")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"An error occurred during Tomb installation: {e}")
+            sys.exit(1)
+
+    def create_and_encrypt_tomb(self, tomb_name):
+        """
+        Creates a new Tomb and encrypts the .env file inside it. The Tomb is identified by a user-provided name.
+        
+        Args:
+            tomb_name (str): The name to be given to the Tomb, used for its file and key.
+        
+        Raises:
+            SystemExit: If an error occurs during the creation or encryption process, the script will exit.
+        """
+        tomb_file = f'{tomb_name}.tomb'
+        key_file = f'{tomb_name}.tomb.key'
+
+        if not os.path.exists(self.env_path):
+            logging.info(f"{self.env_path} does not exist. Creating .env file.")
+            with open(self.env_path, 'w') as env_file:
+                env_file.write("PLACEHOLDER_KEY=your_private_key_here")
+        else:
+            logging.info(f"{self.env_path} already exists.")
+
+        if not os.path.exists(tomb_file):
+            try:
+                logging.info(f"Encrypting {self.env_path} file using Tomb: {tomb_file}.")
+                subprocess.run(['tomb', 'dig', '-s', '10', tomb_file], check=True)
+                subprocess.run(['tomb', 'forge', '-k', key_file], check=True)
+                subprocess.run(['tomb', 'lock', tomb_file, '-k', key_file], check=True)
+                logging.info(f"{tomb_file} created and encrypted successfully.")
+                self.tombs[tomb_name] = (tomb_file, key_file)
+            except subprocess.CalledProcessError as e:
+                logging.error(f"Failed to encrypt .env file: {e}")
+                sys.exit(1)
+        else:
+            logging.info(f"{tomb_file} already exists.")
+
+    def open_tomb(self, tomb_name):
+        """
+        Opens an existing Tomb specified by its name. The user is prompted for a passphrase.
+        
+        Args:
+            tomb_name (str): The name of the Tomb to be opened.
+        
+        Raises:
+            SystemExit: If the Tomb cannot be opened, the script will exit.
+        """
+        if tomb_name in self.tombs:
+            tomb_file, key_file = self.tombs[tomb_name]
+            try:
+                passphrase = self._secure_input("Enter the passphrase to open the Tomb: ")
+                subprocess.run(['tomb', 'open', tomb_file, '-k', key_file], input=passphrase.encode(), check=True)
+                logging.info(f"Tomb {tomb_name} opened successfully.")
+            except subprocess.CalledProcessError as e:
+                logging.error(f"Failed to open the Tomb {tomb_name}: {e}")
+                sys.exit(1)
+            finally:
+                # Clear the passphrase from memory for security reasons
+                passphrase = None
+        else:
+            logging.error(f"Tomb {tomb_name} not found.")
+
+    def close_tomb(self):
+        """
+        Closes all currently open Tombs. This is a global operation that affects all Tombs managed by this script.
+        
+        Raises:
+            SystemExit: If the Tombs cannot be closed, the script will exit.
+        """
+        try:
+            subprocess.run(['tomb', 'close'], check=True)
+            logging.info("All Tombs closed successfully.")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Failed to close the Tombs: {e}")
+            sys.exit(1)
+
+    def _secure_input(self, prompt):
+        """
+        Securely captures user input for a passphrase using getpass to prevent it from being displayed on the screen.
+        
+        Args:
+            prompt (str): The prompt message displayed to the user.
+        
+        Returns:
+            str: The user-entered passphrase, stripped of leading and trailing whitespace.
+        """
+        return getpass.getpass(prompt).strip()
+
+    def start_ui(self):
+        """
+        Starts the command-line user interface for interacting with the Embalmer Agent.
+        Provides options to check Tomb installation, create/open/close Tombs, and list available Tombs.
+        """
+        while True:
+            print("\nOptions:")
+            print("1. Check if Tomb is installed")
+            print("2. Create and encrypt a new Tomb")
+            print("3. Open an existing Tomb")
+            print("4. Close all Tombs")
+            print("5. List available Tombs")
+            print("6. Exit")
+            choice = input("Choose an option: ").strip()
+
+            if choice == '1':
+                self.check_tomb_installed()
+            elif choice == '2':
+                tomb_name = input("Enter a name for the new Tomb: ").strip()
+                if tomb_name:
+                    self.create_and_encrypt_tomb(tomb_name)
+                else:
+                    logging.warning("Tomb name cannot be empty.")
+            elif choice == '3':
+                tomb_name = input("Enter the name of the Tomb to open: ").strip()
+                if tomb_name:
+                    self.open_tomb(tomb_name)
+                else:
+                    logging.warning("Tomb name cannot be empty.")
+            elif choice == '4':
+                self.close_tomb()
+            elif choice == '5':
+                self.list_tombs()
+            elif choice == '6':
+                logging.info("Exiting the Embalmer Agent.")
+                break
+            else:
+                logging.warning("Invalid choice. Please try again.")
+
+    def list_tombs(self):
+        """
+        Lists all Tombs that are currently managed by the script.
+        Provides the names of all available Tombs to the user.
+        """
+        if self.tombs:
+            logging.info("Available Tombs:")
+            for name in self.tombs:
+                print(f"- {name}")
+        else:
+            logging.info("No Tombs available.")
+
+if __name__ == "__main__":
+    agent = EmbalmerAgent()
+    agent.start_ui()
