@@ -1,7 +1,7 @@
 # <a href="https://opensea.io/assets/matic/0xf0ba8dcdfba1b5aed0b46acddf7dde97075e97a2/1">MASTERMIND</a> (c) codephreak GPLv3 2024
 MASTERMIND agent creator and control agent<br />
 
-This MASTERMIND point of departure has been archived visit <a href="https://github.com/gaterage/aglm">Autonomous General Learning Model</a> for the current development model developement integration with aGLM and RAGE<br />
+This MASTERMIND point of departure v1 has been archived visit <a href="https://github.com/easyAGI">easyAGI</a> for the development updates<br />
 
 
 
