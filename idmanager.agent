@@ -1,0 +1,133 @@
+from eth_account import Account
+import os
+from dotenv import load_dotenv, set_key
+import dotenv
+from embalmer import EmbalmerAgent  # Assuming embalmer.py is in the same directory
+
+class IDManagerAgent:
+    """
+    IDManagerAgent is a class that manages Ethereum wallet creation and storage of private keys in a secure environment.
+    The .env file containing the keys is encrypted using Tomb, managed by the EmbalmerAgent.
+    
+    Attributes:
+        env_path (str): The path to the .env file.
+        tomb_name (str): The name of the Tomb used for encryption.
+        embalmer (EmbalmerAgent): An instance of the EmbalmerAgent to manage Tomb operations.
+    """
+
+    def __init__(self, env_path='.env', tomb_name='idmanager_tomb'):
+        """
+        Initialize the IDManagerAgent with a path to the .env file and a Tomb name.
+        
+        Args:
+            env_path (str): Path to the .env file where private keys will be stored.
+            tomb_name (str): The name of the Tomb that will be used to encrypt the .env file.
+        """
+        self.env_path = env_path
+        self.tomb_name = tomb_name
+        self.embalmer = EmbalmerAgent(env_path)
+        self.setup_env()
+
+    def setup_env(self):
+        """
+        Set up the environment by ensuring the Tomb is created and opened.
+        This method ensures that all operations on the .env file are secure.
+        """
+        try:
+            # Ensure Tomb is installed and available
+            self.embalmer.check_tomb_installed()
+
+            # Create and encrypt the Tomb if it doesn't exist
+            self.embalmer.create_and_encrypt_tomb(self.tomb_name)
+
+            # Open the Tomb to access the .env file
+            self.embalmer.open_tomb(self.tomb_name)
+
+            # Load the .env file into the environment
+            self.load_env()
+        except Exception as e:
+            print(f"Error during environment setup: {e}")
+            self.close()  # Ensure Tomb is closed if an error occurs
+            raise
+
+    def load_env(self):
+        """
+        Load the .env file into the environment.
+        """
+        if os.path.exists(self.env_path):
+            load_dotenv(self.env_path)
+            print(f"Environment variables loaded from {self.env_path}.")
+        else:
+            print(f"{self.env_path} does not exist. It will be created when a new wallet is added.")
+
+    def create_wallet(self):
+        """
+        Create a new Ethereum wallet and store its keys in the .env file.
+
+        Returns:
+            tuple: The public address and private key of the newly created wallet.
+        """
+        acct = Account.create()
+        private_key = acct.privateKey.hex()
+        public_address = acct.address
+        self.store_private_key(public_address, private_key)
+        return public_address, private_key
+
+    def store_private_key(self, public_address, private_key):
+        """
+        Store the private key in the .env file.
+
+        Args:
+            public_address (str): The public address of the wallet.
+            private_key (str): The private key of the wallet.
+        """
+        key_name = f'WALLET_{public_address}'
+        dotenv.set_key(self.env_path, key_name, private_key)
+        print(f"Private key for {public_address} stored in {self.env_path}.")
+
+    def get_private_key(self, public_address):
+        """
+        Retrieve the private key associated with a public address from the .env file.
+
+        Args:
+            public_address (str): The public address of the wallet.
+
+        Returns:
+            str or None: The private key if found, otherwise None.
+        """
+        key_name = f'WALLET_{public_address}'
+        private_key = os.getenv(key_name)
+        if private_key:
+            print(f"Private key for {public_address} retrieved.")
+        else:
+            print(f"No private key found for {public_address}.")
+        return private_key
+
+    def close(self):
+        """
+        Close the Tomb to secure the .env file.
+        This ensures that the sensitive data is not left unprotected.
+        """
+        try:
+            self.embalmer.close_tomb()
+        except Exception as e:
+            print(f"Error closing the Tomb: {e}")
+        finally:
+            print("Environment secured. Tomb closed.")
+
+# Example usage
+if __name__ == "__main__":
+    id_manager = IDManagerAgent()
+    
+    try:
+        # Create a new wallet
+        public_address, private_key = id_manager.create_wallet()
+        print(f"New wallet created: {public_address}")
+        
+        # Retrieve the private key for a given public address
+        retrieved_private_key = id_manager.get_private_key(public_address)
+        print(f"Private key for {public_address}: {retrieved_private_key}")
+    
+    finally:
+        # Always close the Tomb when done to ensure security
+        id_manager.close()
