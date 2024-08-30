@@ -1,0 +1,71 @@
+from eth_account import Account
+import json
+import os
+
+class IDManagerAgent:
+    def __init__(self, storage_path='wallets.json'):
+        """
+        Initialize the IDManagerAgent with a path to store wallet information.
+
+        Args:
+            storage_path (str): Path to the JSON file where wallets will be stored.
+        """
+        self.storage_path = storage_path
+        self.wallets = self.load_wallets()
+
+    def load_wallets(self):
+        """
+        Load existing wallets from the storage file.
+
+        Returns:
+            dict: A dictionary of public addresses and their corresponding private keys.
+        """
+        if os.path.exists(self.storage_path):
+            with open(self.storage_path, 'r') as f:
+                return json.load(f)
+        return {}
+
+    def save_wallets(self):
+        """
+        Save the current state of wallets to the storage file.
+        """
+        with open(self.storage_path, 'w') as f:
+            json.dump(self.wallets, f, indent=4)
+
+    def create_wallet(self):
+        """
+        Create a new Ethereum wallet and store its keys.
+
+        Returns:
+            tuple: The public address and private key of the newly created wallet.
+        """
+        acct = Account.create()
+        private_key = acct.privateKey.hex()
+        public_address = acct.address
+        self.wallets[public_address] = private_key
+        self.save_wallets()
+        return public_address, private_key
+
+    def get_private_key(self, public_address):
+        """
+        Retrieve the private key associated with a public address.
+
+        Args:
+            public_address (str): The public address of the wallet.
+
+        Returns:
+            str or None: The private key if found, otherwise None.
+        """
+        return self.wallets.get(public_address, None)
+
+# Example usage
+if __name__ == "__main__":
+    id_manager = IDManagerAgent()
+    
+    # Create a new wallet
+    public_address, private_key = id_manager.create_wallet()
+    print(f"New wallet created: {public_address}")
+    
+    # Retrieve the private key for a given public address
+    retrieved_private_key = id_manager.get_private_key(public_address)
+    print(f"Private key for {public_address}: {retrieved_private_key}")
